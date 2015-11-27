@@ -19,23 +19,29 @@ public class Main {
 
         SearchSystem searchSystem = null;
 
-        // Expecting valid path
+        // expecting valid path
         System.out.println("Enter path to newsgroups(data): ");
-        while(scanner.hasNext()) {
+        // todo: remove comment to get newsgroup path from System.in ######################
+        // for debugging purposes
+        /*while(scanner.hasNext()) {
             String pathNewsgroups = scanner.next();
 
             // check if pathNewsgroups is valid (and a directory)
             try {
                 checkFilePathValid(pathNewsgroups);
                 searchSystem = new SearchSystem(pathNewsgroups);
+                searchSystem.traverseDirectory();
                 break;
             } catch (IOException e) {
                 System.out.println("Could not find newsgroup-path, please enter a valid path!");
             }
-        }
+        }*/
+
+        searchSystem = new SearchSystem("D:\\Wolfi\\workspace_intellij\\gir-ex1\\data_test");
+        // #####################################################################################
 
         while(scanner.hasNext()) {
-            // Expecting <path to topicfile> -searchtype=<bagofwords|biword>
+            // expecting <path to topicfile> -searchtype=<bagofwords|biword>
             System.out.println("Enter path to topic-file: ");
 
             String pathTopicFile = scanner.next();
