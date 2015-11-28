@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.util.Scanner;
 
 /**
- * @author e1327191@student.tuwien.ac.at
+ * @author e1327191@student.tuwien.ac.at, e1325974@student.tuwien.ac.at
  *         Created on: 26.11.2015
  */
 public class Main {
@@ -37,7 +37,7 @@ public class Main {
             }
         }*/
 
-        boolean stemming = false;
+        boolean isStemming = false;
         // Vocabulary
         System.out.println("Enter type of normalization for Vocabulary (s for stemming or f for case folding): ");
         while(scanner.hasNext()) {
@@ -50,10 +50,10 @@ public class Main {
                 char normalizationtype = vocabInput.charAt(0);
                 switch(normalizationtype) {
                     case 's':
-                        stemming = true;
+                        isStemming = true;
                         break;
                     case 'f':
-                        stemming = false;
+                        isStemming = false;
                         break;
                     default:
                         System.out.println("Please enter valid type for the vocabulary normalization!");
@@ -66,9 +66,10 @@ public class Main {
         }
 
 
-        searchSystem = new SearchSystem("../Data/test_data/", stemming);
-        //searchSystem = new SearchSystem("D:\\Wolfi\\workspace_intellij\\gir-ex1\\data_test", stemming);
+        //searchSystem = new SearchSystem("../Data/test_data/", isStemming);
+        searchSystem = new SearchSystem("D:\\Wolfi\\workspace_intellij\\gir-ex1\\data_test", isStemming);
         // #####################################################################################
+
 
         // expecting <path to topicfile> -searchtype=<bagofwords|biword>
         System.out.println("Enter path to topic-file: ");

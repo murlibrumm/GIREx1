@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.lang.System;
+import java.lang.reflect.Array;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -13,7 +15,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
- * @author e1327191@student.tuwien.ac.at
+ * @author e1327191@student.tuwien.ac.at, e1325974@student.tuwien.ac.at
  *         Created on: 26.11.2015
  */
 public class SearchSystem {
@@ -23,10 +25,10 @@ public class SearchSystem {
     Stemmer stemmer;
 
     // expects a valid path
-    public SearchSystem(String pathNewsgroups, boolean stemming) {
+    public SearchSystem(String pathNewsgroups, boolean isStemming) {
         dictionary = new HashMap<String, HashMap<String, ArrayList<Integer>>>();
         this.pathNewsgroups = pathNewsgroups;
-        if(stemming)
+        if(isStemming)
             stemmer = new Stemmer();
 
         try {
@@ -67,12 +69,12 @@ public class SearchSystem {
         // call indexFile for each file in the directory
         ArrayList<File> filesInDir = traverseDirectory.getFilesInDir();
         for (File file : filesInDir) {
-            indexFile(file);
+            indexFile(file, true);
         }
     }
 
     // splits a file into lines, which are indexed by indexLine()
-    private void indexFile(File file) throws IOException {
+    private void indexFile(File file, boolean forDictionary) throws IOException {
         BufferedReader br = new BufferedReader(new FileReader(file.getPath()));
 
         try {
@@ -112,7 +114,7 @@ public class SearchSystem {
                 }
 
                 String[] words = line.split("\\s+");
-                indexLine(words, getFilePathFromParentFolder(file), index);
+                indexLine(words, getFilePathFromParentFolder(file), index, forDictionary);
                 index += words.length;
             }
         } finally {
@@ -127,28 +129,34 @@ public class SearchSystem {
 
     // splits a line into logical modules (bagofwords (1 word) or biword (2 words))
     // and updates/saves occurences in hashmap
-    private void indexLine(String[] words, String fileName, int index) {
+    private void indexLine(String[] words, String fileName, int index, boolean forDictionary) {
         // iterate over all words
         for (String word : words) {
             if(stemmer != null)
                 word = stem(word);
             else
                 word = folding(word);
-            // if the word isn't in the dictionary, add it with empty HashMap
-            if (!dictionary.containsKey(word)) {
-                dictionary.put(word, new HashMap<String, ArrayList<Integer>>());
+            if(forDictionary) {
+                // if the word isn't in the dictionary, add it with empty HashMap
+                if (!dictionary.containsKey(word)) {
+                    dictionary.put(word, new HashMap<String, ArrayList<Integer>>());
+                }
+
+                // get HashMap with all occurences of the word
+                HashMap<String, ArrayList<Integer>> map = dictionary.get(word);
+
+                // if the current file is not in the occurence-HashMap, add it
+                if (!map.containsKey(fileName)) {
+                    map.put(fileName, new ArrayList<Integer>());
+                }
+
+                // add the (word)-position to the occurence-HashMap
+                map.get(fileName).add(index++);
+            } else {
+                if (dictionary.containsKey(word)){
+                    System.out.println(dictionary.get(word));
+                }
             }
-
-            // get HashMap with all occurences of the word
-            HashMap<String, ArrayList<Integer>> map = dictionary.get(word);
-
-            // if the current file is not in the occurence-HashMap, add it
-            if (!map.containsKey(fileName)) {
-                map.put(fileName, new ArrayList<Integer>());
-            }
-
-            // add the (word)-position to the occurence-HashMap
-            map.get(fileName).add(index++);
         }
     }
 
@@ -171,8 +179,8 @@ public class SearchSystem {
     }
 
     // searches for topicFile (via indexFile() & indexLine())
-    public String searchTopicFile(String pathTopicFile) {
-
-        return null;
+    public void searchTopicFile(String pathTopicFile) throws IOException{
+        File topic = new File(pathTopicFile);
+        indexFile(topic, false);
     }
 }
