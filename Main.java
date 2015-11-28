@@ -20,7 +20,7 @@ public class Main {
         SearchSystem searchSystem = null;
 
         // expecting valid path
-        System.out.println("Enter path to newsgroups(data): ");
+        //System.out.println("Enter path to newsgroups(data): ");
         // todo: remove comment to get newsgroup path from System.in ######################
         // for debugging purposes
         /*while(scanner.hasNext()) {
@@ -37,12 +37,42 @@ public class Main {
             }
         }*/
 
-        searchSystem = new SearchSystem("D:\\Wolfi\\workspace_intellij\\gir-ex1\\data_test");
+        boolean stemming = false;
+        // Vocabulary
+        System.out.println("Enter type of normalization for Vocabulary (s for stemming or f for case folding): ");
+        while(scanner.hasNext()) {
+            // expecting <path to topicfile> -searchtype=<bagofwords|biword> -normali
+
+            String vocabInput = scanner.next();
+
+            // check if inout is valid
+            if(vocabInput.length() > 0 && vocabInput.length() < 2){
+                char normalizationtype = vocabInput.charAt(0);
+                switch(normalizationtype) {
+                    case 's':
+                        stemming = true;
+                        break;
+                    case 'f':
+                        stemming = false;
+                        break;
+                    default:
+                        System.out.println("Please enter valid type for the vocabulary normalization!");
+                        break;
+                }
+                break;
+            } else {
+                System.out.println("Please enter valid type for the vocabulary normalization!");
+            }
+        }
+
+
+        searchSystem = new SearchSystem("../Data/test_data/", stemming);
+        //searchSystem = new SearchSystem("D:\\Wolfi\\workspace_intellij\\gir-ex1\\data_test", stemming);
         // #####################################################################################
 
+        // expecting <path to topicfile> -searchtype=<bagofwords|biword>
+        System.out.println("Enter path to topic-file: ");
         while(scanner.hasNext()) {
-            // expecting <path to topicfile> -searchtype=<bagofwords|biword>
-            System.out.println("Enter path to topic-file: ");
 
             String pathTopicFile = scanner.next();
 

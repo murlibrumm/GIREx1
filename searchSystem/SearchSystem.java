@@ -23,10 +23,11 @@ public class SearchSystem {
     Stemmer stemmer;
 
     // expects a valid path
-    public SearchSystem(String pathNewsgroups) {
+    public SearchSystem(String pathNewsgroups, boolean stemming) {
         dictionary = new HashMap<String, HashMap<String, ArrayList<Integer>>>();
         this.pathNewsgroups = pathNewsgroups;
-        stemmer = new Stemmer();
+        if(stemming)
+            stemmer = new Stemmer();
 
         try {
             traverseDirectory();
@@ -51,6 +52,7 @@ public class SearchSystem {
                 System.out.println();
             }
         }
+        System.out.println("finished");
         // ###################################################
     }
 
@@ -128,8 +130,10 @@ public class SearchSystem {
     private void indexLine(String[] words, String fileName, int index) {
         // iterate over all words
         for (String word : words) {
-            word = stem(word);
-
+            if(stemmer != null)
+                word = stem(word);
+            else
+                word = folding(word);
             // if the word isn't in the dictionary, add it with empty HashMap
             if (!dictionary.containsKey(word)) {
                 dictionary.put(word, new HashMap<String, ArrayList<Integer>>());
@@ -149,6 +153,7 @@ public class SearchSystem {
     }
 
     // stem a word via the class Stemmer
+    // expectation stemmer not null
     public String stem(String word) {
         word = word.toLowerCase();
 
@@ -157,8 +162,17 @@ public class SearchSystem {
         return stemmer.toString();
     }
 
+    // case folding a word
+    // TODO: find out: is case folding only lowercasing?
+    public String folding(String word){
+        word = word.toUpperCase();
+        word = word.toLowerCase();
+        return word;
+    }
+
     // searches for topicFile (via indexFile() & indexLine())
     public String searchTopicFile(String pathTopicFile) {
+
         return null;
     }
 }
