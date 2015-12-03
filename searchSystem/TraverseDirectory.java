@@ -1,7 +1,7 @@
 package searchSystem;
 
 /**
- * @author e1327191@student.tuwien.ac.at
+ * @author e1327191@student.tuwien.ac.at, e1325974@student.tuwien.ac.at
  *         Created on: 26.11.2015
  */
 

@@ -26,6 +26,8 @@ public class SearchSystem {
     // topicWords: word => log(occurences)
     private HashMap<String, Double> topicWords;
 
+    private String topicname;
+
     private IndexType indexType;
 
     private Stemmer stemmer;
@@ -51,7 +53,7 @@ public class SearchSystem {
             System.out.println("I/O Error while traversing Directory: " + e.getMessage());
         }
 
-        tfidf = new TFIDF(dictionary, documents);
+        tfidf = new TFIDF(dictionary, documents, topicname);
 
         // todo: remove me! #################################################################
         // for debugging purposes
@@ -93,7 +95,6 @@ public class SearchSystem {
 
     // splits a file into header and content, nomalizes the content, which is indexed by indexConcatLine()
     private void indexFile(File file, boolean forDictionary) throws IOException {
-
         try (BufferedReader br = new BufferedReader(new FileReader(file.getPath()))) {
             // The number of lines of content in the file
             int lines = 0;
@@ -244,7 +245,9 @@ public class SearchSystem {
 
     // searches for topicFile (via indexFile() & indexConcatLines())
     public void searchTopicFile(String pathTopicFile) throws IOException{
+        topicname = pathTopicFile.substring(pathTopicFile.lastIndexOf('/')+1);
         File topic = new File(pathTopicFile);
+        System.out.println(topicname);
         indexFile(topic, false);
 
         // use logarithmic occurrences

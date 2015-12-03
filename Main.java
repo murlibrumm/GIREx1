@@ -99,7 +99,7 @@ public class Main {
 
             String pathTopicFile = scanner.next();
 
-            // check if pathNewsgroups is valid (and a directory)
+            // check if pathTopicFile is valid (and a directory)
             try {
                 checkFilePathValid(pathTopicFile, false);
                 searchSystem.searchTopicFile(pathTopicFile);
