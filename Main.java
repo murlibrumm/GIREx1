@@ -74,28 +74,26 @@ public class Main {
 
         // expecting valid path
         System.out.println("Enter path to newsgroups(data): ");
-        // todo: remove comment to get newsgroup path from System.in #####################################
-        searchSystem = new SearchSystem("D:\\Wolfi\\workspace_intellij\\gir-ex1\\data_test", isStemming, indexType);
-        // for debugging purposes
-        //searchSystem = new SearchSystem("../Data/test_data/", isStemming);
+        // todo: remove (for debugging purposes) #####################################
+        // searchSystem = new SearchSystem("D:\\Wolfi\\workspace_intellij\\gir-ex1\\data_test", isStemming, indexType);
+        // searchSystem = new SearchSystem("../Data/test_data/", isStemming);
         // ###############################################################################################
 
-        /*while(scanner.hasNext()) {
+        while(scanner.hasNext()) {
             String pathNewsgroups = scanner.next();
 
             // check if pathNewsgroups is valid (and a directory)
             try {
-                checkFilePathValid(pathNewsgroups);
+                checkFilePathValid(pathNewsgroups, true);
                 searchSystem = new SearchSystem(pathNewsgroups, isStemming, indexType);
-                searchSystem.traverseDirectory();
                 break;
             } catch (IOException e) {
                 System.out.println("Could not find newsgroup-path, please enter a valid path!");
+                e.printStackTrace();
             }
-        }*/
-        System.out.println("Indexing...");
+        }
 
-        // expecting <path to topicfile> -searchtype=<bagofwords|biword>
+        // expecting valid path
         System.out.println("Enter path to topic-file: ");
         while(scanner.hasNext()) {
 
@@ -103,7 +101,7 @@ public class Main {
 
             // check if pathNewsgroups is valid (and a directory)
             try {
-                checkFilePathValid(pathTopicFile);
+                checkFilePathValid(pathTopicFile, false);
                 searchSystem.searchTopicFile(pathTopicFile);
                 // TODO print search-results in loop (nicely formatted :>)
             } catch (IOException e) {
@@ -112,10 +110,10 @@ public class Main {
         }
     }
 
-    // checks if path is valid (and a directory)
-    private static void checkFilePathValid(String path) throws IOException {
+    // checks if path is valid (file exists and type is according to boolean directory)
+    private static void checkFilePathValid(String path, boolean directory) throws IOException {
         File file = new File(path);
-        if(!file.exists() || !file.isDirectory()) {
+        if (!file.exists() || !((directory && file.isDirectory()) || (!directory && !file.isDirectory()))) {
             throw new IOException("Folder does not exist");
         }
     }
