@@ -1,5 +1,7 @@
 package searchSystem;
 
+import org.apache.commons.codec.language.Soundex;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -29,6 +31,7 @@ public class SearchSystem {
     private IndexType indexType;
 
     private Stemmer stemmer;
+    private Soundex soundex;
     private TFIDF tfidf;
 
     // expects a valid path
@@ -42,6 +45,7 @@ public class SearchSystem {
 
         if (isStemming) {
             stemmer = new Stemmer();
+            soundex = new Soundex();
         }
 
         try {
@@ -55,7 +59,7 @@ public class SearchSystem {
 
         // todo: remove me! #################################################################
         // for debugging purposes
-        /*for (Map.Entry<String, HashMap<String, ArrayList<Integer>>> entry : dictionary.entrySet()) {
+        for (Map.Entry<String, HashMap<String, ArrayList<Integer>>> entry : dictionary.entrySet()) {
             String key = entry.getKey();
             HashMap<String, ArrayList<Integer>> value = entry.getValue();
 
@@ -72,7 +76,7 @@ public class SearchSystem {
                 System.out.println();
             }
         }
-        System.out.println("finished");*/
+        System.out.println("finished");
         // ####################################################################################
     }
 
@@ -224,14 +228,14 @@ public class SearchSystem {
         }
     }
 
-    // stem a word via the class Stemmer
-    // expectation stemmer not null
+    // stem a word via the class Stemmer, and use tolerant match via class Soundex
+    // expectation stemmer, soundex not null
     private String stem(String word) {
         word = word.toLowerCase();
 
         stemmer.add(word.toCharArray(), word.length());
         stemmer.stem();
-        return stemmer.toString();
+        return soundex.soundex(stemmer.toString());
     }
 
     // case folding a word
