@@ -26,8 +26,7 @@ public class TraverseDirectory extends SimpleFileVisitor<Path> {
         return filesInDir;
     }
 
-    // Print information about
-    // each type of file.
+    // Add each file to file-List
     @Override
     public FileVisitResult visitFile(Path file, BasicFileAttributes attr) {
         filesInDir.add(new File(String.valueOf(file)));

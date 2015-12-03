@@ -23,13 +23,16 @@ public class SearchSystem {
     String pathNewsgroups;
     HashMap<String, HashMap<String, ArrayList<Integer>>> dictionary;
     Stemmer stemmer;
+    IndexType indexType;
 
     // expects a valid path
-    public SearchSystem(String pathNewsgroups, boolean isStemming) {
+    public SearchSystem(String pathNewsgroups, boolean isStemming, IndexType indexType) {
         dictionary = new HashMap<String, HashMap<String, ArrayList<Integer>>>();
         this.pathNewsgroups = pathNewsgroups;
-        if(isStemming)
+        this.indexType = indexType;
+        if (isStemming) {
             stemmer = new Stemmer();
+        }
 
         try {
             traverseDirectory();
@@ -37,7 +40,7 @@ public class SearchSystem {
             System.out.println("I/O Error while traversing Directory: " + e.getMessage());
         }
 
-        // todo: remove me! ################################
+        // todo: remove me! #################################################################
         // for debugging purposes
         for (Map.Entry<String, HashMap<String, ArrayList<Integer>>> entry : dictionary.entrySet()) {
             String key = entry.getKey();
@@ -55,7 +58,7 @@ public class SearchSystem {
             }
         }
         System.out.println("finished");
-        // ###################################################
+        // ####################################################################################
     }
 
     // traverses a directory via SimpleFileVisitor and calls indexFile() for each file
@@ -73,7 +76,7 @@ public class SearchSystem {
         }
     }
 
-    // splits a file into lines, which are indexed by indexLine()
+    // splits a file into header and content, nomalizes the content, which is indexed by indexConcatLine()
     private void indexFile(File file, boolean forDictionary) throws IOException {
         BufferedReader br = new BufferedReader(new FileReader(file.getPath()));
 
@@ -93,6 +96,7 @@ public class SearchSystem {
             int index = 0;
 
             // iterate over lines after header, call indexLine() for each line and fill the word => word-position-list
+            String concatLines = "";
             for (int i = 0; i < lines; i++) {
                 String line = br.readLine();
 
@@ -106,6 +110,8 @@ public class SearchSystem {
                 line = line.replaceAll("\\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}\\b", "");
                 // remove special characters
                 line = line.replaceAll("(\\.|\\?|!|\\(|\\)|<|>|,|;|:|\"|'|_|-|\\*|\\[\\])", "");
+                // remove all double or more spaces
+                line = line.replaceAll(" +", " ");
                 // split line at occurences of white-space, call indexLine()
                 line = line.trim();
 
@@ -113,10 +119,10 @@ public class SearchSystem {
                     continue;
                 }
 
-                String[] words = line.split("\\s+");
-                indexLine(words, getFilePathFromParentFolder(file), index, forDictionary);
-                index += words.length;
+                concatLines += line + " ";
             }
+
+            indexConcatLines(concatLines, getFilePathFromParentFolder(file), forDictionary);
         } finally {
             br.close();
         }
@@ -127,16 +133,46 @@ public class SearchSystem {
         return file.getParentFile().getName() + "\\" + file.getName();
     }
 
-    // splits a line into logical modules (bagofwords (1 word) or biword (2 words))
+    // splits a the concatLines into logical modules (bagofwords (1 word) or biword (2 words))
     // and updates/saves occurences in hashmap
-    private void indexLine(String[] words, String fileName, int index, boolean forDictionary) {
-        // iterate over all words
-        for (String word : words) {
-            if(stemmer != null)
-                word = stem(word);
-            else
+    private void indexConcatLines(String concatLines, String fileName, boolean forDictionary) {
+        int index = 0;
+        int words = 0;
+
+        // iterate over all words / biwords
+        while (true) {
+            String word;
+            int indexFirstBlank = index + concatLines.substring(index).indexOf(" ");
+            int indexSecondBlank = 0;
+            if (indexFirstBlank < index) {
+                return;
+            }
+            if (indexType == IndexType.Biword) {
+                indexSecondBlank = indexFirstBlank + 1 + concatLines.substring(indexFirstBlank + 1).indexOf(" ");
+                if (indexSecondBlank < indexFirstBlank + 1) {
+                    return;
+                }
+                word = concatLines.substring(index, indexSecondBlank);
+            } else {
+                word = concatLines.substring(index, indexFirstBlank);
+            }
+            System.out.println(word);
+
+            if (stemmer != null) {
+                if (indexType == IndexType.Biword) {
+                    word = stem(word.substring(0, word.indexOf(" "))) +
+                            " " + stem(word.substring(word.indexOf(" ") + 1, word.length()));
+                } else {
+                    word = stem(word);
+                }
+            } else {
                 word = folding(word);
-            if(forDictionary) {
+            }
+
+            // shift index to the next word
+            index = indexFirstBlank + 1;
+
+            if (forDictionary) {
                 // if the word isn't in the dictionary, add it with empty HashMap
                 if (!dictionary.containsKey(word)) {
                     dictionary.put(word, new HashMap<String, ArrayList<Integer>>());
@@ -151,7 +187,7 @@ public class SearchSystem {
                 }
 
                 // add the (word)-position to the occurence-HashMap
-                map.get(fileName).add(index++);
+                map.get(fileName).add(words++);
             } else {
                 if (dictionary.containsKey(word)){
                     System.out.println(dictionary.get(word));
@@ -171,7 +207,6 @@ public class SearchSystem {
     }
 
     // case folding a word
-    // TODO: find out: is case folding only lowercasing?
     public String folding(String word){
         word = word.toUpperCase();
         word = word.toLowerCase();

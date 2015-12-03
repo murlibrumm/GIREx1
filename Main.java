@@ -1,3 +1,4 @@
+import searchSystem.IndexType;
 import searchSystem.SearchSystem;
 
 import java.io.File;
@@ -19,57 +20,80 @@ public class Main {
 
         SearchSystem searchSystem = null;
 
+        boolean isStemming = false;
+        // Vocabulary
+        System.out.println("Enter type of normalization for Vocabulary (s for stemming or f for case folding): ");
+        while(scanner.hasNext()) {
+
+            String vocabInput = scanner.next();
+            boolean validInput = false;
+
+            // check if input is valid
+            switch(vocabInput) {
+                case "s":
+                    isStemming = true;
+                    validInput = true;
+                    break;
+                case "f":
+                    isStemming = false;
+                    validInput = true;
+                    break;
+            }
+            if ( !validInput) {
+                System.out.println("Please enter valid type for the vocabulary normalization!");
+            } else {
+                break;
+            }
+        }
+
+        IndexType indexType = null;
+        // Vocabulary
+        System.out.println("Enter type of indexing (bag for bag-of-words or bi for biword): ");
+        while(scanner.hasNext()) {
+
+            String indexingInput = scanner.next();
+            boolean validInput = false;
+
+            // check if input is valid
+            switch(indexingInput) {
+                case "bag":
+                    indexType = IndexType.BagOfWords;
+                    validInput = true;
+                    break;
+                case "bi":
+                    indexType = IndexType.Biword;
+                    validInput = true;
+                    break;
+            }
+            if ( !validInput) {
+                System.out.println("Please enter valid type for the indexing!");
+            } else {
+                break;
+            }
+        }
+
         // expecting valid path
-        //System.out.println("Enter path to newsgroups(data): ");
-        // todo: remove comment to get newsgroup path from System.in ######################
+        System.out.println("Enter path to newsgroups(data): ");
+        // todo: remove comment to get newsgroup path from System.in #####################################
+        searchSystem = new SearchSystem("D:\\Wolfi\\workspace_intellij\\gir-ex1\\data_test", isStemming, indexType);
         // for debugging purposes
+        //searchSystem = new SearchSystem("../Data/test_data/", isStemming);
+        // ###############################################################################################
+
         /*while(scanner.hasNext()) {
             String pathNewsgroups = scanner.next();
 
             // check if pathNewsgroups is valid (and a directory)
             try {
                 checkFilePathValid(pathNewsgroups);
-                searchSystem = new SearchSystem(pathNewsgroups);
+                searchSystem = new SearchSystem(pathNewsgroups, isStemming, indexType);
                 searchSystem.traverseDirectory();
                 break;
             } catch (IOException e) {
                 System.out.println("Could not find newsgroup-path, please enter a valid path!");
             }
         }*/
-
-        boolean isStemming = false;
-        // Vocabulary
-        System.out.println("Enter type of normalization for Vocabulary (s for stemming or f for case folding): ");
-        while(scanner.hasNext()) {
-            // expecting <path to topicfile> -searchtype=<bagofwords|biword> -normali
-
-            String vocabInput = scanner.next();
-
-            // check if inout is valid
-            if(vocabInput.length() > 0 && vocabInput.length() < 2){
-                char normalizationtype = vocabInput.charAt(0);
-                switch(normalizationtype) {
-                    case 's':
-                        isStemming = true;
-                        break;
-                    case 'f':
-                        isStemming = false;
-                        break;
-                    default:
-                        System.out.println("Please enter valid type for the vocabulary normalization!");
-                        break;
-                }
-                break;
-            } else {
-                System.out.println("Please enter valid type for the vocabulary normalization!");
-            }
-        }
-
-
-        //searchSystem = new SearchSystem("../Data/test_data/", isStemming);
-        searchSystem = new SearchSystem("D:\\Wolfi\\workspace_intellij\\gir-ex1\\data_test", isStemming);
-        // #####################################################################################
-
+        System.out.println("Indexing...");
 
         // expecting <path to topicfile> -searchtype=<bagofwords|biword>
         System.out.println("Enter path to topic-file: ");
