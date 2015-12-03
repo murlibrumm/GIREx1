@@ -59,7 +59,7 @@ public class SearchSystem {
 
         // todo: remove me! #################################################################
         // for debugging purposes
-        for (Map.Entry<String, HashMap<String, ArrayList<Integer>>> entry : dictionary.entrySet()) {
+        /*for (Map.Entry<String, HashMap<String, ArrayList<Integer>>> entry : dictionary.entrySet()) {
             String key = entry.getKey();
             HashMap<String, ArrayList<Integer>> value = entry.getValue();
 
@@ -76,7 +76,7 @@ public class SearchSystem {
                 System.out.println();
             }
         }
-        System.out.println("finished");
+        System.out.println("finished");*/
         // ####################################################################################
     }
 
