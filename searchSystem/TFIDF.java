@@ -1,6 +1,8 @@
 package searchSystem;
 
+import java.io.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,12 +21,18 @@ public class TFIDF {
     // tfidfTopic: word => score
     private Map<String, Double> tfidfTopic;
 
+    private int queryNumber;
+    private boolean considerDocumentLength;
+
     public TFIDF(HashMap<String, HashMap<String, ArrayList<Integer>>> dictionary,
-                 HashMap<String, HashMap<String, Integer>> documents) {
+                 HashMap<String, HashMap<String, Integer>> documents, boolean considerDocumentLength) {
         this.dictionary = dictionary;
         this.documents = documents;
+        this.considerDocumentLength = considerDocumentLength;
         tfidf = new HashMap<String, HashMap<String, Double>>();
         tfidfTopic = new HashMap<String, Double>();
+        queryNumber = 0;
+
         createTFIDFForDictionary();
     }
 
@@ -39,27 +47,24 @@ public class TFIDF {
                 String documentsKey = innerEntry.getKey();
                 ArrayList<Integer> documentsValue = innerEntry.getValue();
 
-                // calculate score
-                // log(1 + tf_t,d) * log10(N / df_t), with:
-                // ... tf_t,d = Term frequency, how often term t occurs in document d
-                // ... N = number of documents
-                // ... df_t = number of documents, which contain term t
-                double score = Math.log((1d + documentsValue.size())) * Math.log10((double)(documents.size() / wordValue.size()));
-                //System.out.println("score " + score + " tf_t,d " + documentsValue.size() + " N " + documents.size() + " df_t " + wordValue.size() + " log " +  Math.log((1d + documentsValue.size())) + " log10 " + Math.log10((double) (documents.size() / wordValue.size())));
-
-                // Include document length in score
-                // tf_t,d = tf_t,d / max{tf_w,d}
-                //score = Math.log(1 + (documentsValue.size() / Collections.max(documents.get(documentsKey).values())))
-                //        * Math.log10(documents.size() / wordValue.size());
-
-                tfidf.get(wordKey).put(documentsKey, score);
-
-                /*System.out.println("   document: " + documentsKey);
-                System.out.print ("      ");
-                for (int i : documentsValue) {
-                    System.out.print (i + ", ");
+                double score;
+                if (!considerDocumentLength) {
+                    // calculate score
+                    // log(1 + tf_t,d) * log10(N / df_t), with:
+                    // ... tf_t,d = Term frequency, how often term t occurs in document d
+                    // ... N = number of documents
+                    // ... df_t = number of documents, which contain term t
+                    score = Math.log((1d + (double)documentsValue.size())) *
+                            Math.log10((double)(documents.size() / wordValue.size()));
+                    //System.out.println("score " + score + " tf_t,d " + documentsValue.size() + " N " + documents.size() + " df_t " + wordValue.size() + " log " +  Math.log((1d + documentsValue.size())) + " log10 " + Math.log10((double) (documents.size() / wordValue.size())));
+                } else {
+                    // Include document length in score
+                    // tf_t,d = tf_t,d / max{tf_w,d}
+                    score = Math.log(1d + ((double)documentsValue.size() /
+                            (double)Collections.max(documents.get(documentsKey).values()))) *
+                            Math.log10((double)(documents.size() / wordValue.size()));
                 }
-                System.out.println();*/
+                tfidf.get(wordKey).put(documentsKey, score);
             }
         }
     }
@@ -87,18 +92,38 @@ public class TFIDF {
             }
         }
 
-        // todo: for debugging purposes; delete
-        Map<String, Double> sortedCrunchifyMapValue = new HashMap<String, Double>();
         // Sort Map on value by calling crunchifySortMap()
+        Map<String, Double> sortedCrunchifyMapValue;
         sortedCrunchifyMapValue = CrunchifyMapUtil.crunchifySortMap(tfidfTopic);
+
         System.out.println("\nsortedCrunchifyMapValue: \n");
         int rank = 1;
+        String output = "";
         for (Map.Entry<String, Double> entry : sortedCrunchifyMapValue.entrySet()) {
-            if(entry.getValue() == 0.00)
+            // break if score
+            if(entry.getValue() == 0.00 || rank > 100) {
                 break;
-            System.out.println(topicName + "\t" + "Q0" + "\t" + entry.getKey() + "\t" + rank + "\t" + entry.getValue() + "\t" + "group2-exercise1");
+            }
+            output += topicName + "\t" + "Q" + queryNumber + "\t" +
+                    entry.getKey() + "\t" + rank + "\t" + entry.getValue() + "\t" + "group2-exercise1\n";
             rank++;
         }
+
+        System.out.println(output);
+        writeStringToFile(output, "output" + topicName + ".txt");
+
+        queryNumber++;
+    }
+
+    private void writeStringToFile(String output, String filename) {
+        try {
+            PrintWriter writer = new PrintWriter(filename, "UTF-8");
+            writer.print(output);
+            writer.close();
+        } catch (FileNotFoundException | UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
     }
 
 }

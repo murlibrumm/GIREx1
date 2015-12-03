@@ -29,7 +29,7 @@ public class Main {
             boolean validInput = false;
 
             // check if input is valid
-            switch(vocabInput) {
+            switch (vocabInput) {
                 case "s":
                     isStemming = true;
                     validInput = true;
@@ -39,8 +39,9 @@ public class Main {
                     validInput = true;
                     break;
             }
-            if ( !validInput) {
-                System.out.println("Please enter valid type for the vocabulary normalization!");
+            if (!validInput) {
+                System.out.println("ERROR: Please enter valid type for the vocabulary normalization!");
+                System.out.println("Enter type of normalization for Vocabulary (s for stemming or f for case folding): ");
             } else {
                 break;
             }
@@ -55,7 +56,7 @@ public class Main {
             boolean validInput = false;
 
             // check if input is valid
-            switch(indexingInput) {
+            switch (indexingInput) {
                 case "bag":
                     indexType = IndexType.BagOfWords;
                     validInput = true;
@@ -65,8 +66,36 @@ public class Main {
                     validInput = true;
                     break;
             }
-            if ( !validInput) {
-                System.out.println("Please enter valid type for the indexing!");
+            if (!validInput) {
+                System.out.println("ERROR: Please enter valid type for the indexing!");
+                System.out.println("Enter type of indexing (bag for bag-of-words or bi for biword): ");
+            } else {
+                break;
+            }
+        }
+
+        boolean considerDocumentLength = false;
+        // Vocabulary
+        System.out.println("Enter if document-length should be considered by scoring-algorithm (y for yes or n for no): ");
+        while(scanner.hasNext()) {
+
+            String scoringInput = scanner.next();
+            boolean validInput = false;
+
+            // check if input is valid
+            switch (scoringInput) {
+                case "y":
+                    considerDocumentLength = true;
+                    validInput = true;
+                    break;
+                case "n":
+                    considerDocumentLength = false;
+                    validInput = true;
+                    break;
+            }
+            if (!validInput) {
+                System.out.println("ERROR: Please enter valid command!");
+                System.out.println("Enter if document-length should be considered by scoring-algorithm (y for yes or n for no): ");
             } else {
                 break;
             }
@@ -85,11 +114,11 @@ public class Main {
             // check if pathNewsgroups is valid (and a directory)
             try {
                 checkFilePathValid(pathNewsgroups, true);
-                searchSystem = new SearchSystem(pathNewsgroups, isStemming, indexType);
+                searchSystem = new SearchSystem(pathNewsgroups, isStemming, indexType, considerDocumentLength);
                 break;
             } catch (IOException e) {
-                System.out.println("Could not find newsgroup-path, please enter a valid path!");
-                e.printStackTrace();
+                System.out.println("ERROR: Could not find newsgroup-path, please enter a valid path!");
+                System.out.println("Enter path to newsgroups(data): ");
             }
         }
 
@@ -104,7 +133,8 @@ public class Main {
                 searchSystem.searchTopicFile(pathTopicFile);
                 System.out.println("\nEnter path to topic-file: ");
             } catch (IOException e) {
-                System.out.println("Could not find topic-path, please enter a valid path!");
+                System.out.println("ERROR: Could not find topic-path, please enter a valid path!");
+                System.out.println("Enter path to topic-file: ");
             }
         }
     }

@@ -32,7 +32,7 @@ public class SearchSystem {
     private TFIDF tfidf;
 
     // expects a valid path
-    public SearchSystem(String pathNewsgroups, boolean isStemming, IndexType indexType) {
+    public SearchSystem(String pathNewsgroups, boolean isStemming, IndexType indexType, boolean considerDocumentLength) {
         dictionary = new HashMap<String, HashMap<String, ArrayList<Integer>>>();
         documents = new HashMap<String, HashMap<String, Integer>>();
         topicWords = new HashMap<String, Double>();
@@ -51,7 +51,7 @@ public class SearchSystem {
             System.out.println("I/O Error while traversing Directory: " + e.getMessage());
         }
 
-        tfidf = new TFIDF(dictionary, documents);
+        tfidf = new TFIDF(dictionary, documents, considerDocumentLength);
 
         // todo: remove me! #################################################################
         // for debugging purposes
@@ -205,7 +205,7 @@ public class SearchSystem {
                 }
 
                 // if the current word is not in the documents-HashMap, add it
-                if (!documentMap.containsKey(fileName)) {
+                if (!documentMap.containsKey(word)) {
                     documentMap.put(word, 0);
                 }
 
