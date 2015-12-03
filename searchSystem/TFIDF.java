@@ -19,13 +19,10 @@ public class TFIDF {
     // tfidfTopic: word => score
     private Map<String, Double> tfidfTopic;
 
-    private String topicname;
-
     public TFIDF(HashMap<String, HashMap<String, ArrayList<Integer>>> dictionary,
-                 HashMap<String, HashMap<String, Integer>> documents, String topicname) {
+                 HashMap<String, HashMap<String, Integer>> documents) {
         this.dictionary = dictionary;
         this.documents = documents;
-        this.topicname = topicname;
         tfidf = new HashMap<String, HashMap<String, Double>>();
         tfidfTopic = new HashMap<String, Double>();
         createTFIDFForDictionary();
@@ -67,7 +64,7 @@ public class TFIDF {
         }
     }
 
-    public void createIFIDFForTopic(HashMap<String, Double> topicWords) {
+    public void createIFIDFForTopic(HashMap<String, Double> topicWords, String topicName) {
         // iterate over all words from our topic (topicWords)
         for (Map.Entry<String, Double> entry : topicWords.entrySet()) {
             String key = entry.getKey();
@@ -99,7 +96,7 @@ public class TFIDF {
         for (Map.Entry<String, Double> entry : sortedCrunchifyMapValue.entrySet()) {
             if(entry.getValue() == 0.00)
                 break;
-            System.out.println(topicname + "\t" + "Q0" + "\t" + entry.getKey() + "\t" + rank + "\t" + entry.getValue() + "\t" + "group2-exercise1");
+            System.out.println(topicName + "\t" + "Q0" + "\t" + entry.getKey() + "\t" + rank + "\t" + entry.getValue() + "\t" + "group2-exercise1");
             rank++;
         }
     }

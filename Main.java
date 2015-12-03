@@ -74,7 +74,7 @@ public class Main {
 
         // expecting valid path
         System.out.println("Enter path to newsgroups(data): ");
-        // todo: remove (for debugging purposes) #####################################
+        // todo: remove (for debugging purposes) ########################################################
         // searchSystem = new SearchSystem("D:\\Wolfi\\workspace_intellij\\gir-ex1\\data_test", isStemming, indexType);
         // searchSystem = new SearchSystem("../Data/test_data/", isStemming);
         // ###############################################################################################
@@ -96,14 +96,13 @@ public class Main {
         // expecting valid path
         System.out.println("Enter path to topic-file: ");
         while(scanner.hasNext()) {
-
             String pathTopicFile = scanner.next();
 
-            // check if pathTopicFile is valid (and a directory)
+            // check if pathTopicFile is valid (and not a directory)
             try {
                 checkFilePathValid(pathTopicFile, false);
                 searchSystem.searchTopicFile(pathTopicFile);
-                // TODO print search-results in loop (nicely formatted :>)
+                System.out.println("\nEnter path to topic-file: ");
             } catch (IOException e) {
                 System.out.println("Could not find topic-path, please enter a valid path!");
             }
